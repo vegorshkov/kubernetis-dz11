@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-stable-page
+data:
+  index.html: |
+    <h1> STABLE VERSION (v1)</h1>
+    <p>This is the main production release.</p>
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-canary-page
+data:
+  index.html: |
+    <h1> CANARY VERSION (v2)</h1>
+    <p>This is the experimental canary release.</p>

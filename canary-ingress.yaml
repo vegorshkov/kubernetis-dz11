@@ -1,0 +1,42 @@
+# Основной Ingress → направляет весь трафик на STABLE
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-main
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: canary.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-stable
+            port:
+              number: 80
+---
+# Canary Ingress → забирает часть трафика (10%) и направляет на CANARY
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-canary
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "10"  # <-- 10% трафика на canary
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: canary.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-canary
+            port:
+              number: 80

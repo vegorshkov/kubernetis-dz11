@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-canary
+spec:
+  replicas: 1              # Canary запускаю Одной  репликой чтобы меньшее кол-во пользователей нарвалось на баги если они встретятся.
+  selector:
+    matchLabels:
+      app: nginx
+      version: canary      # <-- переключено для Канарейки
+  template:
+    metadata:
+      labels:
+        app: nginx
+        version: canary    # <-- переключено для Канарейки
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.28
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html
+        configMap:
+          name: nginx-canary-page  # <-- переключено для Канарейки
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-canary
+spec:
+  selector:
+    app: nginx
+    version: canary        # <-- переключено для Канарейки
+  ports:
+  - port: 80
+    targetPort: 80
